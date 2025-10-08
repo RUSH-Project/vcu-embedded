@@ -1,0 +1,22 @@
+*.log
+*.pyc
+*.xml
+**/.vs/
+**/.log
+*.a
+*.o
+*.d
+*.bak
+*.rej
+*.cache
+
+jlink.config
+jlink.log
+Makefile
+cmake_install.cmake
+
+build/
+CMakeFiles/
+
+# VSCode settings
+.vscode/settings.json

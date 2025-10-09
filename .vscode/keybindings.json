@@ -1,0 +1,21 @@
+// COPY-PASTE this file in your local C:\Users\<YOUR_USERNAME>\AppData\Roaming\Code\User\keybindings.json to work
+[
+    {
+        "key": "ctrl+1",
+        "command": "workbench.action.tasks.runTask",
+        "args": "build"
+    },
+    {
+        "key": "ctrl+2",
+        "command": "workbench.action.tasks.runTask",
+        "args": "clean build"
+    },
+    {
+        "key": "ctrl+shift+alt+l",
+        "command": "editor.action.transformToLowercase"
+    },
+    {
+        "key": "ctrl+shift+alt+u",
+        "command": "editor.action.transformToUppercase"
+    }
+]

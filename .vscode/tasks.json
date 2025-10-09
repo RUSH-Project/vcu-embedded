@@ -1,0 +1,154 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": [
+                "${workspaceRoot}/${config:DEVICE_NAME}/tools/create_build_folder.bat '${workspaceRoot}/${config:DEVICE_NAME}/build';",
+
+                "cmake -G '${config:CMAKE_FILES}' -S '${workspaceRoot}/${config:DEVICE_NAME}' -B '${workspaceRoot}/${config:DEVICE_NAME}/build';",
+
+                "cd '${workspaceRoot}/${config:DEVICE_NAME}/build';",
+
+                "cmake --build .;",
+                "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }", 
+
+                "Write-Host `r`nbuild completed at $(Get-Date)`r`n -ForegroundColor Blue"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": "absolute"
+            }
+        },
+        {
+            "label": "clean build",
+            "type": "shell",
+            "command": [
+                "${workspaceRoot}/${config:DEVICE_NAME}/tools/create_build_folder.bat '${workspaceRoot}/${config:DEVICE_NAME}/build';",
+                "rm -r ${workspaceRoot}/${config:DEVICE_NAME}/build/*;",
+
+                "cmake -G '${config:CMAKE_FILES}' -S '${workspaceRoot}/${config:DEVICE_NAME}' -B '${workspaceRoot}/${config:DEVICE_NAME}/build';",
+
+                "cd '${workspaceRoot}/${config:DEVICE_NAME}/build';",
+
+                "cmake --build .;",
+                "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }", 
+
+                "Write-Host `r`nbuild completed at $(Get-Date)`r`n -ForegroundColor Blue"
+            ],
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": "absolute"
+            }
+        },
+        {
+            "label": "flash target",
+            "type": "shell",
+            "command": [
+                "openocd -f ${config:DEVICE_NAME}/tools/openocd/${config:OPENOCD_CONFIG} -c \"_erase_ \" -c \"_flash_ ${config:DEVICE_NAME}/build/${config:DEVICE_NAME}.elf\" -c exit &&",
+                
+                "powershell -noprofile Write-Host `r`nflash target completed at $(Get-Date)`r`n -ForegroundColor Blue"
+            ],
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/c"
+                        ]
+                    }
+                }
+            },
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".",
+                        "endsPattern": ".",
+                    }
+                }
+            ]
+        },
+        {
+            "label": "build, flash target",
+            "type": "shell",
+            "dependsOn": [
+                "build",
+                "flash target",
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".",
+                        "endsPattern": ".",
+                    }
+                }
+            ]
+        },
+        {
+            "label": "clang-format check",
+            "type": "shell",
+            "command": [
+
+            ],
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "absolute",
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+): (error|warning): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "clang-format fix",
+            "type": "shell",
+            "command": [
+
+            ],
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "absolute",
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+): (error|warning): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+    ]
+}

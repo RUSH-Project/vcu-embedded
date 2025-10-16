@@ -17,6 +17,3 @@ cmake_install.cmake
 
 build/
 CMakeFiles/
-
-# VSCode settings
-.vscode/settings.json

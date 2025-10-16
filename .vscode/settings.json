@@ -1,0 +1,10 @@
+{
+    "DEVICE_NAME": "vcu-embedded",
+    "OPENOCD_CONFIG": "STM32G474RET6_JLINK.cfg",
+    "SVD_FILE": "STM32G4RET6",
+    "CMAKE_FILES" : "MinGW Makefiles", // Windows : "MinGW Makefiles", Linux "Unix Makefiles"
+    "COMPILER_PATH" : "C:/msys64/mingw64/bin/arm-none-eabi-gcc", // Windows : C:/msys64/mingw64/bin/arm-none-eabi-gcc Linux : "/usr/bin/arm-none-eabi-gcc"
+
+    "cortex-debug.gdbPath": "C:/msys64/mingw64/bin/gdb-multiarch",
+    "clang-format.executable": "${workspaceRoot}/clang_tools/.clang_format",
+}

@@ -19,6 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "projdefs.h"
+#include "stm32g4xx_hal_fdcan.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -45,6 +47,10 @@ ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
 
 FDCAN_HandleTypeDef hfdcan1;
+
+FDCAN_TxHeaderTypeDef txHeader;
+uint8_t txData[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08}; // Tx Buffer
+
 
 SPI_HandleTypeDef hspi1;
 
@@ -76,6 +82,7 @@ static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_TIM5_Init(void);
 void StartDefaultTask(void *argument);
+static void FDCAN_Config(void);
 
 /* USER CODE BEGIN PFP */
 
@@ -712,11 +719,67 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  for(;;)
+  FDCAN_Config();
+  HAL_FDCAN_Start(&hfdcan1); //Initialize CAN Bus
+
+  while(1)
   {
-    osDelay(1);
+    if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &txHeader, txData) != HAL_OK) {
+					Error_Handler();
+		}
+    HAL_Delay(10);
+    
+    // Reverse relay
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+
+    // Emergency shutdown relay
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+
+    // Debug LED
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
+
+    osDelay(pdMS_TO_TICKS(1000));
   }
   /* USER CODE END 5 */
+}
+
+static void FDCAN_Config(void)
+{
+  FDCAN_FilterTypeDef sFilterConfig;
+
+  /* Configure Rx filter */
+  sFilterConfig.IdType = FDCAN_STANDARD_ID;
+  sFilterConfig.FilterIndex = 0;
+  sFilterConfig.FilterType = FDCAN_FILTER_RANGE;
+  sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
+  sFilterConfig.FilterID1 = 0x321;
+  sFilterConfig.FilterID2 = 0x7FF;
+  if (HAL_FDCAN_ConfigFilter(&hfdcan1, &sFilterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* Start the FDCAN module */
+  if (HAL_FDCAN_Start(&hfdcan1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  if (HAL_FDCAN_ActivateNotification(&hfdcan1, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* Prepare Tx Header */
+  txHeader.Identifier = 0x321;
+  txHeader.IdType = FDCAN_STANDARD_ID;
+  txHeader.TxFrameType = FDCAN_DATA_FRAME;
+  txHeader.DataLength = FDCAN_DLC_BYTES_2;
+  txHeader.ErrorStateIndicator = FDCAN_ESI_PASSIVE;
+  txHeader.BitRateSwitch = FDCAN_BRS_OFF;
+  txHeader.FDFormat = FDCAN_CLASSIC_CAN;
+  txHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+  txHeader.MessageMarker = 0;
 }
 
 /**

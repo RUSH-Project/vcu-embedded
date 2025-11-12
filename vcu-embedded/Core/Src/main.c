@@ -728,10 +728,10 @@ void StartDefaultTask(void *argument)
     HAL_Delay(10);
     
     // Reverse relay
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
 
     // Emergency shutdown relay
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 
     // Debug LED
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);

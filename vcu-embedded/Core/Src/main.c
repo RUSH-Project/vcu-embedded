@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "stm32g4xx_hal_gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -722,13 +723,18 @@ void StartDefaultTask(void *argument)
 
   while(1)
   {
-    if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &txHeader, txData) != HAL_OK) {
-					Error_Handler();
-		}
-    HAL_Delay(10);
+    // if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &txHeader, txData) != HAL_OK) {
+		// 			Error_Handler();
+		// }
+    // HAL_Delay(10);
     
     // Reverse relay
-    //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+    if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0)){
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+    }
+    else {
+      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+    }
 
     // Emergency shutdown relay
     //HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
@@ -736,7 +742,7 @@ void StartDefaultTask(void *argument)
     // Debug LED
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
 
-    osDelay(pdMS_TO_TICKS(1000));
+    osDelay(pdMS_TO_TICKS(100));
   }
   /* USER CODE END 5 */
 }
